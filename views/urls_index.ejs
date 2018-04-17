@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>TinyApp</title>
+  </head>
+  <body>
+    <ul>
+      <% for(var shortUrl in urls) { %>
+        <li><a href="#"><%= shortUrl %></a> : <%= urls[shortUrl] %></li>
+        <% }; %>
+    </ul>
+
+  </body>
+</html>
