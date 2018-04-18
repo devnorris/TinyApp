@@ -6,9 +6,14 @@
   <body>
     <ul>
       <% for(var shortUrl in urls) { %>
-        <li><a href="#"><%= shortUrl %></a> : <%= urls[shortUrl] %></li>
+        <li>
+         <%= shortUrl %></a> : <%= urls[shortUrl] %>
+      <form method="POST" action="/urls/<%= shortUrl %>/delete">
+           <button type="submit" value="Delete">Delete</button>
+          <a href="/urls/<%= shortUrl %>">Edit</a>
+      </form>
+        </li>
         <% }; %>
     </ul>
-
   </body>
 </html>

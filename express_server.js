@@ -46,22 +46,43 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
-  const short = req.params.id;
-  let templateVars = { shortURL: short,
-                       longURL: urlDatabase[short]};
+  let templateVars = { shortURL: req.params.id,
+                       longURL: urlDatabase[req.params.id]};
   res.render("urls_show", templateVars);
+});
+
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  console.log(req.params.id);
+  console.log(req.body.longURL);
+  res.redirect('/urls');
+})
+
+app.post('/urls/:id/delete', (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
 });
 
 app.post("/urls", (req, res) => {
   let randomURL = generateRandomString();
   urlDatabase[randomURL] = req.body.longURL;
-  res.redirect('http://localhost:8080/urls/' + randomURL);
+  res.redirect('/urls');
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase.randomURL;
+  let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
