@@ -1,7 +1,3 @@
-function generateRandomString() {
-let shortURL = Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
-return shortURL;
-}
 
 let express = require("express");
 const app = express();
@@ -15,10 +11,23 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  "JamTime" : {
+    id: "JamTime",
+    email: "Jamit@gmail.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "HackerAttacker" : {
+    id: "HackerAttacker",
+    email: "TicTacHackAttack@example.com",
+    password: "YouWillNeverKnow"
+  }
+}
 
 
 
@@ -87,11 +96,33 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('name');
   res.redirect('/urls')
+});
+
+app.get("/register", (req, res) => {
+res.render("urls_registration")
 })
 
+app.post("/register", (req, res) => {
+let randomID = generateRandomString();
+let user = {id : randomID,
+            email : req.body.email,
+            password : req.body.password}
+users[randomID] = user;
+if (req.body.email === '' || req.body.password === '') {
+  res.status(400).send("Uh Oh, looks like something went wrong!")
+} else if (users.email === users.email) {
+  res.status(400).send("Sorry this email is already registered.")
+};
+res.cookie('user_id', user);
+res.redirect("/urls")
+});
 
 
 
+function generateRandomString() {
+let shortURL = Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+return shortURL;
+}
 
 
 
