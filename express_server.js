@@ -32,9 +32,9 @@ const users = {
 
 
 
-// app.get("/", (req, res) => {
-//   res.end("Hello!");
-// });
+app.get("/", (req, res) => {
+  res.end("Hello!");
+});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -51,7 +51,6 @@ app.listen(PORT, () => {
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase,
                        user: users[req.cookies['user_id']] };
-  console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
@@ -89,16 +88,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/login", (req, res) => {
-  res.cookie('name', req.body.username );
-  res.redirect('/urls')
-})
-
-app.post("/logout", (req, res) => {
-  res.clearCookie('name');
-  res.redirect('/urls')
-});
-
 app.get("/register", (req, res) => {
 res.render("urls_registration")
 })
@@ -123,6 +112,31 @@ res.redirect("/urls")
 app.get("/login", (req, res) => {
   res.render("urls_login");
 })
+
+app.post("/login", (req, res) => {
+  var userKey = '';
+  for (var key in users) {
+    if (users[key].email === req.body.email) {
+        userKey = users[key];
+    }
+  }
+    if ( userKey === '') {
+        res.status(403).send("Sorry that email doesn't exist. Lets get you signed up!");
+        res.redirect('/register');
+    } else if (req.body.password !== userKey.password) {
+        res.status(403).send("Sorry, passwords don't match.")
+    } else {
+        res.cookie('user_id', userKey.id);
+        res.redirect('/');
+    }
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect('/urls')
+});
+
+
 
 
 function generateRandomString() {
