@@ -32,17 +32,17 @@ const users = {
 
 
 
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.end("Hello!");
+// });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.end("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -50,12 +50,13 @@ app.listen(PORT, () => {
 
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase,
-                       username: req.cookies['name'] };
+                       user: users[req.cookies['user_id']] };
+  console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies['name'] }
+  let templateVars = { user: users[req.cookies['user_id']] }
   res.render("urls_new", templateVars);
 });
 
@@ -63,7 +64,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
                        longURL: urlDatabase[req.params.id],
-                       username: req.cookies['name'],};
+                       user: users[req.cookies['user_id']] }
   res.render("urls_show", templateVars);
 });
 
@@ -104,19 +105,24 @@ res.render("urls_registration")
 
 app.post("/register", (req, res) => {
 let randomID = generateRandomString();
+for (let userKey in users) {
+if (req.body.email === '' || req.body.password === '') {
+  res.status(400).send("Uh Oh, looks like something went wrong!")
+} else if (req.body.email === users[userKey].email) {
+  res.status(400).send("Sorry this email is already registered.")
+}
+};
 let user = {id : randomID,
             email : req.body.email,
             password : req.body.password}
 users[randomID] = user;
-if (req.body.email === '' || req.body.password === '') {
-  res.status(400).send("Uh Oh, looks like something went wrong!")
-} else if (users.email === users.email) {
-  res.status(400).send("Sorry this email is already registered.")
-};
-res.cookie('user_id', user);
+res.cookie('user_id', user.id);
 res.redirect("/urls")
 });
 
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+})
 
 
 function generateRandomString() {
