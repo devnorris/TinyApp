@@ -12,7 +12,7 @@
 
         <li>
 
-         <%= shortUrl %></a> : <%= urls[shortUrl] %>
+         <%= shortUrl %> : <%= urls[shortUrl].url  %>
 
       <form method="POST" action="/urls/<%= shortUrl %>/delete">
            <button type="submit" value="Delete">Delete</button>
