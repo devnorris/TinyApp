@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+
     <title>TinyApp</title>
+
   </head>
-  <% if ('user_id') { %>
+
+<h1>Tiny App</h1>
+
+  <% if (user) { %>
+
+   <h3> Hi <%= user.email %>, </h3>
+
   <form method="POST" action="/logout">
-    <button type="submit" value="Logout"><a href='/login'>Logout</a></button>
+
+    <button type="submit" value="Logout">Logout</button>
+
   </form>
+
   <% } else { %>
-  <form method="POST" action="/login">
-    <input id="username" type="text" name="username" placeholder="username" style="width: 150px">
-    <input type="submit" value="Submit">
-  </form>
+
+  <button type="submit" value="Login"><a href='/login'>Login</a></button>
+  <button type="submit" value="Register"><a href='/register'>Register</a></button>
+
   <% } %>
-   <h3> Hi <%= user.id %>, </h3>
+
+
 </html>

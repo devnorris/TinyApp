@@ -42,6 +42,14 @@ const users = {
   }
 };
 
+function cookieExist(cookie) {
+  if (req.session.user_id) {
+    true;
+  } else {
+    false;
+  }
+};
+
 
 function filterURL(userID) {
   const urlObt = {};
@@ -82,6 +90,9 @@ app.listen(PORT, () => {
 });
 
 app.get('/urls', (req, res) => {
+  if (!users[req.session.user_id]){
+    res.redirect('/login');
+  }
   const urlsUser = filterURL(req.session.user_id);
   let templateVars = { urls: urlsUser,
                        user: users[req.session.user_id] };
@@ -99,6 +110,9 @@ app.get("/urls/new", (req, res) => {
 
 
 app.get("/urls/:id", (req, res) => {
+  if (!users[req.session.user_id]){
+    res.redirect('/login')
+  }
   let templateVars = { shortURL: req.params.id,
                        longURL: urlDatabase[req.params.id],
                        user: users[req.session.user_id] };
@@ -106,11 +120,6 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  for (let url in urlDatabase) {
-  console.log("ID url" , url);
-  console.log("urlDatabase;", req.body.longURL)
-  console.log("input url: ", urlDatabase[req.params.id].url)
-  }
   urlDatabase[req.params.id].url = req.body.longURL;
   res.redirect('/urls');
 })
@@ -130,12 +139,15 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].url;
   res.redirect(longURL);
 });
 
 app.get("/register", (req, res) => {
-  res.render("urls_registration")
+  let templateVars = {
+    user: users[req.session.user_id]
+  }
+  res.render("urls_registration", templateVars )
 })
 
 app.post("/register", (req, res) => {
@@ -157,7 +169,10 @@ res.redirect("/urls")
 });
 
 app.get("/login", (req, res) => {
-  res.render("urls_login");
+    let templateVars = {
+    user: users[req.session.user_id]
+  }
+  res.render("urls_login", templateVars);
 })
 
 app.post("/login", (req, res) => {
@@ -179,8 +194,8 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie(user.id);
-  res.redirect('/urls')
+  req.session = null;
+  res.redirect('/login')
 });
 
 
