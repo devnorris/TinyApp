@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
   <head>
 
     <title>TinyApp</title>
@@ -12,16 +14,16 @@
 
    <h3> Hi <%= user.email %>, </h3>
 
-  <form method="POST" action="/logout">
+    <form method="POST" action="/logout">
 
-    <button type="submit" value="Logout">Logout</button>
+      <button type="submit" value="Logout">Logout</button>
 
-  </form>
+    </form>
 
   <% } else { %>
 
-  <button type="submit" value="Login"><a href='/login'>Login</a></button>
-  <button type="submit" value="Register"><a href='/register'>Register</a></button>
+    <button type="submit" value="Login"><a href='/login'>Login</a></button>
+    <button type="submit" value="Register"><a href='/register'>Register</a></button>
 
   <% } %>
 

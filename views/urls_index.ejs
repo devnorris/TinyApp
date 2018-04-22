@@ -1,7 +1,8 @@
 <!DOCTYPE html>
+
 <html lang="en">
-<head>
-</head>
+
+<head></head>
 
   <% include ./partials/_header %>
 
@@ -17,15 +18,16 @@
 
       <form method="POST" action="/urls/<%= shortUrl %>/delete">
            <button type="submit" value="Delete">Delete</button>
-          <a href="/urls/<%= shortUrl %>">Edit</a>
+          <a href="/urls/<%= shortUrl %>">Update</a>
       </form>
 
         </li>
 
 
-        <% }; %>
+      <% }; %>
 
     </ul>
+
       <p><a href="/urls/new">Shorten URL here!</a>
 
   </body>

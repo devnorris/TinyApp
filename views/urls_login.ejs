@@ -1,13 +1,25 @@
 <!DOCTYPE html>
+
 <html lang="en">
-<head>
-</head>
+
+<head></head>
+
   <% include ./partials/_header %>
-  <body>
-  <form method="POST" action="/login">
-      <p><input id="email" type="email" name="email" placeholder="Email" style="width: 300px"></p>
-      <p><input id="password" type="password" name="password" placeholder="password" style="width: 300px"></p>
-      <input type="submit" value="Login">
-    </form>
+
+  <body style="font-size:20px; padding:50px;">
+
+    <h2>Welcome!</h2>
+
+      <form method="POST" action="/login">
+
+        <p><input id="email" type="email" name="email" placeholder="Email" style="width: 300px"></p>
+
+        <p><input id="password" type="password" name="password" placeholder="password" style="width: 300px"></p>
+
+        <input type="submit" value="Login">
+
+      </form>
+
   </body>
+
 </html>
