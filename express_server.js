@@ -18,15 +18,15 @@ app.set("view engine", "ejs");
 
 // updated URL database
 const urlDatabase = {
-          "b2xVn2": {
-            url : "http://www.lighthouselabs.ca",
-            userID : "JamTime"
-          },
-          "9sm5xK": {
-            url : "http://www.google.com",
-            userID : "HackerAttacker"
-          }
-  };
+  "b2xVn2": {
+    url : "http://www.lighthouselabs.ca",
+    userID : "JamTime"
+  },
+  "9sm5xK": {
+    url : "http://www.google.com",
+    userID : "HackerAttacker"
+  }
+};
 
 
 const users = {
@@ -42,14 +42,11 @@ const users = {
   }
 };
 
-//helper function that may help later in project
-function cookieExist(cookie) {
-  if (req.session.user_id) {
-    true;
-  } else {
-    false;
-  }
-};
+// Generates a random string that will be used for users id and shortened URLs
+function generateRandomString() {
+  let shortURL = Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
+    return shortURL;
+}
 
 
 // helper function to store matching users with their websites
@@ -67,11 +64,11 @@ function filterURL(userID) {
 // helper function to add longURL to users list
 function addLongUrl(longURL, userID) {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {
-          shortURL: shortURL,
-          url: longURL,
-          userID: userID
-  }
+    urlDatabase[shortURL] = {
+      shortURL: shortURL,
+      url: longURL,
+      userID: userID
+    }
 };
 
 
@@ -80,31 +77,27 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-// No need for this page anymore
-// app.get("/hello", (req, res) => {
-//   res.end("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
-
+// shows the index of users short URLs
 app.get('/urls', (req, res) => {
-  if (!users[req.session.user_id]){   // check if user is logged in
+  if (!users[req.session.user_id]) {
     res.redirect('/login');
   }
-  const urlsUser = filterURL(req.session.user_id);
-  let templateVars = { urls: urlsUser,
-                       user: users[req.session.user_id] };
+    const urlsUser = filterURL(req.session.user_id);
+    let templateVars = {
+      urls: urlsUser,
+      user: users[req.session.user_id]
+    };
   res.render("urls_index", templateVars);
 });
 
 
+// page to add new urls
 app.get("/urls/new", (req, res) => {
   let templateVars = { user: users[req.session.user_id] }
   if (!req.session['user_id']) {
@@ -115,17 +108,23 @@ app.get("/urls/new", (req, res) => {
 });
 
 
+// Takes you to page that shows ShortURL associated with longURL and can update
 app.get("/urls/:id", (req, res) => {
-  if (!users[req.session.user_id]){ // check if user is logged in
-    res.redirect('/login')
+  if (!users[req.session.user_id]){ res.redirect('/login'); }
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    user: users[req.session.user_id]
+  };
+  if (req.session.user_id !== templateVars.longURL.userID) {
+    res.status(400).send('Sorry, you dont have access to this shortened URL.');
+  } else if (req.session.user_id === templateVars.longURL.userID) {
+    res.render("urls_show", templateVars);
   }
-  let templateVars = { shortURL: req.params.id,
-                       longURL: urlDatabase[req.params.id],
-                       user: users[req.session.user_id] };
-  res.render("urls_show", templateVars);
 });
 
 
+// posts the updated url to users index and index page
 app.post("/urls/:id", (req, res) => {
   urlDatabase[req.params.id].url = req.body.longURL;
   res.redirect('/urls');
@@ -172,19 +171,21 @@ app.get("/register", (req, res) => {
 
 // Signs new users up and errors on existing users or empty input
 app.post("/register", (req, res) => {
-let randomID = generateRandomString();
-for (let userKey in users) {
-if (req.body.email === '' || req.body.password === '') {
-  res.status(400).send("<html><body><p>Uh Oh! Looks like something went wrong. Lets try that again.</p><li><button type=submit value=Register><a href='/register'>Register</a></button></li></body></html>")
-} else if (req.body.email === users[userKey].email) {
-  res.status(400).send("<html><body><p>Looks like you are already Registered!</p><li><button type=submit value=Login><a href='/login'>Login</a></button></li></body></html>")
-}
+  let randomID = generateRandomString();
+    for (let userKey in users) {
+      if (req.body.email === '' || req.body.password === '') {
+        res.status(400).send("<html><body><p>Uh Oh! Looks like something went wrong. Lets try that again.</p><li><button type=submit value=Register><a href='/register'>Register</a></button></li></body></html>")
+      } else if (req.body.email === users[userKey].email) {
+        res.status(400).send("<html><body><p>Looks like you are already Registered!</p><li><button type=submit value=Login><a href='/login'>Login</a></button></li></body></html>")
+      }
 };
-var hashedPassword = bcrypt.hashSync(req.body.password, 10);
-let user = {id : randomID,
-            email : req.body.email,
-            password : hashedPassword}
-users[randomID] = user;
+  var hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  let user = {
+    id : randomID,
+    email : req.body.email,
+    password : hashedPassword
+  }
+  users[randomID] = user;
 req.session.user_id = user.id;
 res.redirect("/urls")
 });
@@ -192,10 +193,10 @@ res.redirect("/urls")
 
 // login page
 app.get("/login", (req, res) => {
-    let templateVars = {
+  let templateVars = {
     user: users[req.session.user_id]
   }
-  res.render("urls_login", templateVars);
+res.render("urls_login", templateVars);
 });
 
 
@@ -209,12 +210,12 @@ app.post("/login", (req, res) => {
     }
   };
     if ( userKey === '') {
-        res.status(403).send("<html><body><p>Sorry that email doesn't exist. Lets get you signed up!</p><li><button type=submit value=Register><a href='/register'>Register</a></button></li></body></html>");
+      res.status(403).send("<html><body><p>Sorry that email doesn't exist. Lets get you signed up!</p><li><button type=submit value=Register><a href='/register'>Register</a></button></li></body></html>");
     } else if (!bcrypt.compareSync(req.body.password, userKey.password)) {
-        res.status(403).send("<html><body><p>Oops, wrong password!</p><li><button type=submit value=Login><a href='/login'>Login</a></button></li></body></html>")
+      res.status(403).send("<html><body><p>Oops, wrong password!</p><li><button type=submit value=Login><a href='/login'>Login</a></button></li></body></html>")
     } else {
-        req.session.user_id = userKey.id;
-        res.redirect('/urls');
+      req.session.user_id = userKey.id;
+      res.redirect('/urls');
     }
 });
 
@@ -225,13 +226,11 @@ app.post("/logout", (req, res) => {
   res.redirect('/login')
 });
 
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`)});
 
 
-// Generates a random string that will be used for users id and shortened URLs
-function generateRandomString() {
-let shortURL = Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
-return shortURL;
-}
+
 
 
 
